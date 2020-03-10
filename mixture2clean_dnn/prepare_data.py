@@ -13,7 +13,7 @@ import time
 import matplotlib.pyplot as plt
 from scipy import signal
 import pickle
-# import cPickle
+# import _pickle as cPickle
 import h5py
 from sklearn import preprocessing
 
@@ -360,6 +360,8 @@ def pad_with_border(x, n_pad):
     """
     x_pad_list = [x[0:1]] * n_pad + [x] + [x[-1:]] * n_pad
     return np.concatenate(x_pad_list, axis=0)
+    """ replacing this part by extend()--Yb
+    """
 
 ###
 def compute_scaler(args):
@@ -380,8 +382,8 @@ def compute_scaler(args):
     (n_segs, n_concat, n_freq) = x.shape
     x2d = x.reshape((n_segs * n_concat, n_freq))
     scaler = preprocessing.StandardScaler(with_mean=True, with_std=True).fit(x2d)
-    print(scaler.mean_)
-    print(scaler.scale_)
+    # print(scaler.mean_)
+    # print(scaler.scale_)
     
     # Write out scaler. 
     out_path = os.path.join(workspace, "packed_features", "spectrogram", data_type, "%ddb" % int(snr), "scaler.p")

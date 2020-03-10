@@ -7,7 +7,7 @@ Modified: -
 import numpy as np
 import os
 import pickle
-import cPickle
+
 import h5py
 import argparse
 import time
@@ -19,11 +19,10 @@ import config as cfg
 from data_generator import DataGenerator
 from spectrogram_to_wave import recover_wav
 
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.optimizers import Adam
-from keras.models import load_model
-
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Flatten
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import load_model
 
 def eval(model, gen, x, y):
     """Validation function. 
@@ -49,6 +48,9 @@ def eval(model, gen, x, y):
     # Compute loss. 
     loss = pp_data.np_mean_absolute_error(y_all, pred_all)
     return loss
+    
+    """Why not use model.evaluate() directly--Yb
+    """
     
 
 def train(args):
@@ -137,7 +139,7 @@ def train(args):
                     'tr_loss': tr_loss, 
                     'te_loss': te_loss, }
     stat_path = os.path.join(stats_dir, "%diters.p" % iter)
-    cPickle.dump(stat_dict, open(stat_path, 'wb'), protocol=cPickle.HIGHEST_PROTOCOL)
+    pickle.dump(stat_dict, open(stat_path, 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
     
     # Train. 
     t1 = time.time()
@@ -156,7 +158,7 @@ def train(args):
                          'tr_loss': tr_loss, 
                          'te_loss': te_loss, }
             stat_path = os.path.join(stats_dir, "%diters.p" % iter)
-            cPickle.dump(stat_dict, open(stat_path, 'wb'), protocol=cPickle.HIGHEST_PROTOCOL)
+            pickle.dump(stat_dict, open(stat_path, 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
             
         # Save model. 
         if iter % 5000 == 0:
@@ -208,12 +210,12 @@ def inference(args):
     for (cnt, na) in enumerate(names):
         # Load feature. 
         feat_path = os.path.join(feat_dir, na)
-        data = cPickle.load(open(feat_path, 'rb'))
+        data = pickle.load(open(feat_path, 'rb'))
         [mixed_cmplx_x, speech_x, noise_x, alpha, na] = data
         mixed_x = np.abs(mixed_cmplx_x)
         
         # Process data. 
-        n_pad = (n_concat - 1) / 2
+        n_pad = (n_concat - 1) // 2
         mixed_x = pp_data.pad_with_border(mixed_x, n_pad)
         mixed_x = pp_data.log_sp(mixed_x)
         speech_x = pp_data.log_sp(speech_x)

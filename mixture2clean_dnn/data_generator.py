@@ -24,6 +24,10 @@ class DataGenerator(object):
                 if iter == self._te_max_iter_:
                     break
             iter += 1
+            
+            if (iter%100==0):
+                print(iter)
+            
             if pointer >= n_samples:
                 epoch += 1
                 if (self._type_) == 'test' and (epoch == 1):

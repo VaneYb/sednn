@@ -8,7 +8,10 @@ import argparse
 import os
 import csv
 import numpy as np
-import cPickle
+import pickle
+
+import matplotlib as mpl  
+mpl.use('Agg') 
 import matplotlib.pyplot as plt
 
 
@@ -32,9 +35,9 @@ def plot_training_stat(args):
     
     # Load stats. 
     stats_dir = os.path.join(workspace, "training_stats", "%ddb" % int(tr_snr))
-    for iter in xrange(bgn_iter, fin_iter, interval_iter):
+    for iter in range(bgn_iter, fin_iter, interval_iter):
         stats_path = os.path.join(stats_dir, "%diters.p" % iter)
-        dict = cPickle.load(open(stats_path, 'rb'))
+        dict = pickle.load(open(stats_path, 'rb'))
         tr_losses.append(dict['tr_loss'])
         te_losses.append(dict['te_loss'])
         iters.append(dict['iter'])
@@ -47,7 +50,9 @@ def plot_training_stat(args):
     plt.ylabel("Loss")
     plt.legend(handles=[line_tr, line_te])
     plt.xticks(np.arange(len(iters)), iters)
-    plt.show()
+    # plt.show()
+    plt.draw()
+    plt.savefig(os.path.join(workspace, "training_stats", "%ddb" % int(tr_snr),"plot1.png"))  
 
 
 def calculate_pesq(args):
@@ -85,12 +90,12 @@ def get_stats(args):
     """Calculate stats of PESQ. 
     """
     pesq_path = "_pesq_results.txt"
-    with open(pesq_path, 'rb') as f:
+    with open(pesq_path, 'rt') as f:
         reader = csv.reader(f, delimiter='\t')
         lis = list(reader)
         
     pesq_dict = {}
-    for i1 in xrange(1, len(lis) - 1):
+    for i1 in range(1, len(lis) - 1):
         li = lis[i1]
         na = li[0]
         pesq = float(li[1])
